@@ -7,6 +7,7 @@ const {
 } = require(`../utils`);
 
 const DEFAULT_COUNT = 1;
+const MAXIMUM_NUMBER_SENTENCES = 5;
 const FILE_NAME = `mock.json`;
 
 const TITLES = [
@@ -69,8 +70,8 @@ const getPictureFileName = (randomInt) => {
 
 const generateOffers = (count) => (
   Array(count).fill({}).map(() => ({
-    category: [CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]],
-    description: shuffle(SENTENCES).slice(1, 5).join(` `),
+    category: shuffle(CATEGORIES).slice(0, getRandomInt(1, CATEGORIES.length - 1)),
+    description: shuffle(SENTENCES).slice(0, getRandomInt(1, MAXIMUM_NUMBER_SENTENCES)).join(` `),
     picture: getPictureFileName(getRandomInt(PictureRestrict.min, PictureRestrict.max)),
     title: TITLES[getRandomInt(0, TITLES.length - 1)],
     type: Object.keys(OfferType)[Math.floor(Math.random() * Object.keys(OfferType).length)],
