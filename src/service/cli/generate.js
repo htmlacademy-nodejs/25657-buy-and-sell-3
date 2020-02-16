@@ -27,7 +27,7 @@ const PictureRestrict = {
 };
 
 const getPictureFileName = (randomInt) => {
-  return `item${(`0${randomInt}`).substr(-(PictureRestrict.toString()).length)}.jpg`;
+  return `item${(`0${randomInt}`).substr(-(PictureRestrict.max.toString()).length)}.jpg`;
 };
 
 const readFileInfo = async (fileName) => {
