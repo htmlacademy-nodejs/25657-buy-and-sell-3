@@ -1,5 +1,6 @@
 'use strict';
 
+/** @member {Object} */
 const chalk = require(`chalk`);
 
 module.exports = {

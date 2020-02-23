@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require(`fs`).promises;
+/** @member {Object} */
 const chalk = require(`chalk`);
 const {
   getRandomInt,
