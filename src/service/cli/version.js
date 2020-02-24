@@ -1,5 +1,6 @@
 'use strict';
 
+/** @member {Object} */
 const chalk = require(`chalk`);
 const packageJsonFile = require(`../../../package.json`);
 
