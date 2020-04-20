@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Eugeno/25657-buy-and-sell-3#readme",
   "devDependencies": {
+    "@types/express": "4.17.4",
     "eslint": "6.8.0",
     "eslint-config-htmlacademy": "0.5.2",
     "nodemon": "2.0.2"
