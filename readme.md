@@ -1,7 +1,7 @@
-# Личный проект «Куплю. Продам» [![Build status][travis-image]][travis-url]
+# Учебный проект «Куплю. Продам» [![Build status][travis-image]][travis-url]
 
 * Студент: [Евгений Закурдаев](https://up.htmlacademy.ru/nodejs/3/user/25657).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Рожков](https://htmlacademy.ru/profile/id1069033).
 
 ---
 

@@ -3,11 +3,14 @@
 const fs = require(`fs`).promises;
 /** @member {Object} */
 const chalk = require(`chalk`);
+const { nanoid } = require(`nanoid`);
 const {
   getRandomInt,
   shuffle,
 } = require(`../utils`);
+const { MAX_ID_LENGTH } = require(`../constants`);
 
+const MAX_COMMENTS = 4;
 const DEFAULT_COUNT = 1;
 const MAXIMUM_NUMBER_SENTENCES = 5;
 const FILE_NAME = `mock.json`;
@@ -39,17 +42,29 @@ const readFileInfo = async (fileName) => {
   }
 };
 
+const generateComments = (count, comments) => (
+  Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
+    text: shuffle(comments)
+      .slice(0, getRandomInt(1, 3))
+      .join(` `),
+  }))
+);
+
 const generateOffers = async (count) => {
   const sentences = await readFileInfo('data/sentences.txt');
   const titles = await readFileInfo('data/titles.txt');
   const categories = await readFileInfo('data/categories.txt');
+  const comments = await readFileInfo('data/comments.txt');
   return Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
     category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
     description: shuffle(sentences).slice(0, getRandomInt(1, MAXIMUM_NUMBER_SENTENCES)).join(` `),
     picture: getPictureFileName(getRandomInt(PictureRestrict.min, PictureRestrict.max)),
     title: titles[getRandomInt(0, titles.length - 1)],
     type: Object.keys(OfferType)[Math.floor(Math.random() * Object.keys(OfferType).length)],
     sum: getRandomInt(SumRestrict.min, SumRestrict.max),
+    comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
   }));
 };
 
