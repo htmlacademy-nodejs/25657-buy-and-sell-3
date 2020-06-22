@@ -1,20 +1,12 @@
 'use strict';
 
 const express = require(`express`);
-/** @member {Object} */
-const chalk = require(`chalk`);
-const fs = require(`fs`).promises;
+const { HttpCode } = require(`../constants`);
+const { getMockData } = require(`../lib/get-mock-data`);
+const routes = require(`../api`);
 
 const DEFAULT_PORT = 3000;
-const FILENAME = `mock.json`;
-
-const HttpCode = {
-  OK: 200,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-  FORBIDDEN: 403,
-  UNAUTHORIZED: 401,
-};
+const API_PREFIX = `/api`;
 
 module.exports = {
   name: `--server`,
@@ -24,11 +16,11 @@ module.exports = {
 
     const app = express();
     app.use(express.json());
+    app.use(API_PREFIX, routes);
 
     app.get(`/offers`, async (req, res) => {
       try {
-        const fileContent = await fs.readFile(FILENAME, `utf-8`);
-        const mocks = JSON.parse(fileContent);
+        const mocks = await getMockData();
         res.json(mocks);
       } catch (err) {
         res.status(HttpCode.INTERNAL_SERVER_ERROR).send(err);
