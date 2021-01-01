@@ -4,7 +4,6 @@ class SearchService {
   }
 
   findAll(searchText) {
-    console.log(searchText);
     return this._offers.filter((offer) => offer.title.includes(searchText));
   }
 }

@@ -3,7 +3,7 @@ const { HttpCode } = require(`../constants`);
 
 const route = new Router();
 
-module.exports.categories = (app, categoryService) => {
+module.exports = (app, categoryService) => {
   app.use(`/categories`, route);
 
   route.get(`/`, (req, res) => {

@@ -6,7 +6,7 @@ const { commentValidator } = require(`../middlewares/comment-validator`);
 
 const route = new Router();
 
-module.exports.offers = (app, offerService, commentsService) => {
+module.exports = (app, offerService, commentsService) => {
   app.use(`/offers`, route);
 
   route.get(`/`, (req, res) => {
@@ -58,7 +58,6 @@ module.exports.offers = (app, offerService, commentsService) => {
   });
 
   route.post(`/:offerId/comments`, [offerExist(offerService), commentValidator], (req, res) => {
-    console.log(res);
     const { offer } = res.locals;
     const comment = commentsService.create(offer, req.body);
     return res.status(HttpCode.CREATED).json(comment);
