@@ -52,8 +52,8 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
   const { id } = req.params;
   const [offer, categories] = await Promise.all([
     api.getOffer(id),
-    api.getCategories()
-  ]).catch((err) => logger.error(err));
+    api.getCategories(),
+  ]);
   res.render(`ticket-edit`, { offer, categories });
 });
 

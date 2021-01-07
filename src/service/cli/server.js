@@ -13,7 +13,7 @@ const API_PREFIX = `/api`;
 
 module.exports = {
   name: `--server`,
-  run(args) {
+  async run(args) {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
@@ -40,14 +40,9 @@ module.exports = {
     });
 
     try {
-      app.listen(port, (err) => {
-        if (err) {
-          return logger.error(`An error occurred on server creation: ${err.message}`);
-        }
-
-        return logger.info(`Listening to connections on ${port}`);
+      app.listen(port, () => {
+        logger.info(`Listening to connections on ${port}`);
       });
-
     } catch (err) {
       logger.error(`An error occurred: ${err.message}`);
       process.exit(1);
