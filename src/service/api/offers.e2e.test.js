@@ -45,7 +45,7 @@ describe(`API returns an offer with given id`, () => {
   test(`Offer's title is "Продам советскую посуду. Почти не разбита."`, () => expect(response.body.title).toBe(`Продам советскую посуду. Почти не разбита.`));
 });
 
-describe(`API creates an offer if data is valid`, () => {
+describe(`API creates an offer`, () => {
   const newOffer = {
     category: `Котики`,
     title: `Дам погладить котика`,
@@ -69,18 +69,6 @@ describe(`API creates an offer if data is valid`, () => {
     .get(`/offers`)
     .expect((res) => expect(res.body.length).toBe(6))
   );
-});
-
-describe(`API refuses to create an offer if data is invalid`, () => {
-  const newOffer = {
-    category: `Котики`,
-    title: `Дам погладить котика`,
-    description: `Дам погладить котика. Дорого. Не гербалайф`,
-    picture: `cat.jpg`,
-    type: `OFFER`,
-    sum: 100500
-  };
-  const app = createAPI();
 
   test(`Without any required property response code is 400`, async () => {
     for (const key of Object.keys(newOffer)) {
@@ -118,44 +106,31 @@ describe(`API changes existent offer`, () => {
     .get(`/offers/O0jAFn`)
     .expect((res) => expect(res.body.title).toBe(`Дам погладить котика`))
   );
+
+  test(`Returns status code 404 when trying to change non-existent offer`, () => {
+    return request(app)
+      .put(`/offers/NOEXST`)
+      .send(newOffer)
+      .expect(HttpCode.NOT_FOUND);
+  });
+
+  test(`API returns status code 400 when trying to change an offer with invalid data`, () => {
+    const invalidOffer = {
+      category: `Это`,
+      title: `невалидный`,
+      description: `объект`,
+      picture: `объявления`,
+      type: `нет поля sum`
+    };
+
+    return request(app)
+      .put(`/offers/O0jAFn`)
+      .send(invalidOffer)
+      .expect(HttpCode.BAD_REQUEST);
+  });
 });
 
-test(`API returns status code 404 when trying to change non-existent offer`, () => {
-  const app = createAPI();
-
-  const validOffer = {
-    category: `Это`,
-    title: `валидный`,
-    description: `объект`,
-    picture: `объявления`,
-    type: `однако`,
-    sum: 404
-  };
-
-  return request(app)
-    .put(`/offers/NOEXST`)
-    .send(validOffer)
-    .expect(HttpCode.NOT_FOUND);
-});
-
-test(`API returns status code 400 when trying to change an offer with invalid data`, () => {
-  const app = createAPI();
-
-  const invalidOffer = {
-    category: `Это`,
-    title: `невалидный`,
-    description: `объект`,
-    picture: `объявления`,
-    type: `нет поля sum`
-  };
-
-  return request(app)
-    .put(`/offers/NOEXST`)
-    .send(invalidOffer)
-    .expect(HttpCode.BAD_REQUEST);
-});
-
-describe(`API correctly deletes an offer`, () => {
+describe(`API deletes an offer`, () => {
   const app = createAPI();
 
   let response;
@@ -173,14 +148,12 @@ describe(`API correctly deletes an offer`, () => {
     .get(`/offers`)
     .expect((res) => expect(res.body.length).toBe(4))
   );
-});
 
-test(`API refuses to delete non-existent offer`, () => {
-  const app = createAPI();
-
-  return request(app)
-    .delete(`/offers/NOEXST`)
-    .expect(HttpCode.NOT_FOUND);
+  test(`API refuses to delete non-existent offer`, () => {
+    return request(app)
+      .delete(`/offers/NOEXST`)
+      .expect(HttpCode.NOT_FOUND);
+  });
 });
 
 describe(`API returns a list of comments to given offer`, () => {
@@ -200,13 +173,13 @@ describe(`API returns a list of comments to given offer`, () => {
     () => expect(response.body[0].text).toBe(`Продаю в связи с переездом. Отрываю от сердца. Неплохо, но дорого`));
 });
 
-
-describe(`API creates a comment if data is valid`, () => {
+describe(`API creates a comment`, () => {
   const newComment = {
     text: `Валидному комментарию достаточно этого поля`
   };
 
-  let app; let response;
+  let app;
+  let response;
 
   beforeAll(async () => {
     app = await createAPI();
@@ -221,29 +194,25 @@ describe(`API creates a comment if data is valid`, () => {
     .get(`/offers/48-5aO/comments`)
     .expect((res) => expect(res.body.length).toBe(4))
   );
-});
 
-test(`API refuses to create a comment to non-existent offer and returns status code 404`, async () => {
-  const app = await createAPI();
+  test(`Refuses to create a comment to non-existent offer and returns status code 404`, async () => {
+    return request(app)
+      .post(`/offers/NOEXST/comments`)
+      .send({
+        text: `Неважно`
+      })
+      .expect(HttpCode.NOT_FOUND);
+  });
 
-  return request(app)
-    .post(`/offers/NOEXST/comments`)
-    .send({
-      text: `Неважно`
-    })
-    .expect(HttpCode.NOT_FOUND);
-});
-
-test(`API refuses to create a comment when data is invalid, and returns status code 400`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-    .post(`/offers/48-5aO/comments`)
+  test(`Refuses to create a comment when data is invalid, and returns status code 400`, async () => {
+    return request(app)
+      .post(`/offers/48-5aO/comments`)
       .send({})
       .expect(HttpCode.BAD_REQUEST);
+  });
 });
 
-describe(`API correctly deletes a comment`, () => {
+describe(`API deletes a comment`, () => {
   let app; let response;
 
   beforeAll(async () => {
@@ -258,20 +227,16 @@ describe(`API correctly deletes a comment`, () => {
     .get(`/offers/48-5aO/comments`)
     .expect((res) => expect(res.body.length).toBe(2))
   );
-});
 
-test(`API refuses to delete non-existent comment`, async () => {
-  const app = await createAPI();
+  test(`Refuses to delete non-existent comment`, async () => {
+    return request(app)
+      .delete(`/offers/3rRSLo/comments/NOEXST`)
+      .expect(HttpCode.NOT_FOUND);
+  });
 
-  return request(app)
-    .delete(`/offers/3rRSLo/comments/NOEXST`)
-    .expect(HttpCode.NOT_FOUND);
-});
-
-test(`API refuses to delete a comment to non-existent offer`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-  .delete(`/offers/NOEXST/comments/3rRSLo`)
-  .expect(HttpCode.NOT_FOUND);
+  test(`Refuses to delete a comment to non-existent offer`, async () => {
+    return request(app)
+      .delete(`/offers/NOEXST/comments/3rRSLo`)
+      .expect(HttpCode.NOT_FOUND);
+  });
 });
