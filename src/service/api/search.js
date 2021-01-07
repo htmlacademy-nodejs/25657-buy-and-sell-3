@@ -3,7 +3,7 @@ const { HttpCode } = require(`../constants`);
 
 const route = new Router();
 
-module.exports.search = (app, searchService) => {
+module.exports = (app, searchService) => {
   app.use(`/search`, route);
 
   route.get(`/`, (req, res) => {

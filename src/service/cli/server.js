@@ -3,32 +3,49 @@
 const express = require(`express`);
 const { HttpCode } = require(`../constants`);
 const { getMockData } = require(`../lib/get-mock-data`);
+const { getLogger } = require('../lib/logger');
 const routes = require(`../api`);
+
+const logger = getLogger({name: `api`});
 
 const DEFAULT_PORT = 3000;
 const API_PREFIX = `/api`;
 
 module.exports = {
   name: `--server`,
-  run(args) {
+  async run(args) {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     const app = express();
     app.use(express.json());
-    app.use(API_PREFIX, routes);
 
-    app.get(`/offers`, async (req, res) => {
-      try {
-        const mocks = await getMockData();
-        res.json(mocks);
-      } catch (err) {
-        res.status(HttpCode.INTERNAL_SERVER_ERROR).send(err);
-      }
+    app.use((req, res, next) => {
+      logger.debug(`Request on route ${req.url}`);
+      res.on(`finish`, () => {
+        logger.info(`Response status code ${res.statusCode}`);
+      });
+      next();
     });
 
-    app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(`Not found`));
+    app.use(API_PREFIX, routes);
 
-    app.listen(port);
+    app.use((req, res) => {
+      res.status(HttpCode.NOT_FOUND).send(`Not found`);
+      logger.error(`Route not found: ${req.url}`);
+    });
+
+    app.use((err, _req, _res, _next) => {
+      logger.error(`An error occured on processing request: ${err.message}`);
+    });
+
+    try {
+      app.listen(port, () => {
+        logger.info(`Listening to connections on ${port}`);
+      });
+    } catch (err) {
+      logger.error(`An error occurred: ${err.message}`);
+      process.exit(1);
+    }
   }
 };

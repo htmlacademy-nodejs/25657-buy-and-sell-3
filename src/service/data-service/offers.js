@@ -33,7 +33,6 @@ class OffersService {
   }
 
   findOne(id) {
-    console.log(this._offers);
     return this._offers.find((item) => item.id === id);
   }
 
